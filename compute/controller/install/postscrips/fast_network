@@ -1,0 +1,42 @@
+#!/bin/bash
+
+####################################################################################
+# fast_network: customize the network configuration for the fast infrastructure
+#
+# Author: Hans Then <hans.then@clustervision.com>
+# 
+# This file does the following
+# 1. it takes the IP address of eth0
+# 2. assigns it to the docker0 bridge
+# 3. adds eth0 do the docker0 bridge
+# 4. creates an alias docker0:0 to be used as gateway for the container
+# 5. adds a default route to the controller
+
+logger "started fast network script"
+
+IP=$(ip addr show dev eth0 scope global | grep inet | awk -F' ' '{print $2}')
+if [ -z "$IP" ]; then
+   echo "No IP found on eth0, assume we have been here before. DRY!"
+   exit 1
+fi
+
+# create the docker bridge
+brctl addbr docker0
+ip link set docker0 up
+
+IP3_4=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $3"."$4}')
+IP3_4_GW=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $3+127"."$4}')
+
+# setup two interfaces docker0 with the gateway interface and docker0:0 in the bridge
+ip addr flush dev docker0
+ip addr add 172.16.${IP3_4_GW}/16 dev docker0
+ip addr add ${IP} dev docker0
+
+# remove the ip addres from eth0
+ip addr flush dev eth0
+
+# add the eth0 device to the docker0 bridge
+brctl addif docker0 eth0
+
+# setup the route to the controller
+route add default gw controller

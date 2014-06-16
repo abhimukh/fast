@@ -1,0 +1,22 @@
+[2KThe push refers to a repository [controller:5000/fast] (len: 1)
+[2KSending image list
+[2KPushing repository controller:5000/fast (1 tags)
+[2KImage 511136ea3c5a already pushed, skipping
+[2KImage 7064731afe90 already pushed, skipping
+[2KImage 0b443ba03958 already pushed, skipping
+[2KImage 479b2d4355a0 already pushed, skipping
+[2KImage caad9f385e7e already pushed, skipping
+[2KImage fc9ad226e6bc already pushed, skipping
+[2KImage f7aa0dbac99d already pushed, skipping
+[2KImage 6ee35b84ad32 already pushed, skipping
+[2KImage 38e657a99f80 already pushed, skipping
+[2KImage da2a0dc5db5c already pushed, skipping
+[2KImage f6e730b06d9a already pushed, skipping
+[2KImage ccd7b16e9e9a already pushed, skipping
+[2KImage a8fcce16be74 already pushed, skipping
+[2KImage 1cbe65dbdc9c already pushed, skipping
+[2KImage 2232d435f2bd already pushed, skipping
+[2KImage bec796c221e4 already pushed, skipping
+
+[0A[2K14f0f0220a7a: Pushing [0B[1A[2K14f0f0220a7a: Buffering to disk 1.024 kB[1B[1A[2K14f0f0220a7a: Buffering to disk [1B[1A[2K14f0f0220a7a: Pushing [=========================>                         ]    512 B/1.024 kB 0[1B[1A[2K14f0f0220a7a: Pushing [==================================================>] 1.024 kB/1.024 kB[1B[1A[2K14f0f0220a7a: Pushing [==================================================>] 1.024 kB/1.024 kB[1B[1A[2K14f0f0220a7a: Image successfully pushed [1B
+[0A[2K08123d0e0891: Pushing [0B[1A[2K08123d0e0891: Buffering to disk 1.024 kB[1B[1A[2K08123d0e0891: Buffering to disk [1B[1A[2K08123d0e0891: Pushing [=========================>                         ]    512 B/1.024 kB 0[1B[1A[2K08123d0e0891: Pushing [==================================================>] 1.024 kB/1.024 kB[1B[1A[2K08123d0e0891: Pushing [==================================================>] 1.024 kB/1.024 kB[1B[1A[2K08123d0e0891: Image successfully pushed [1B[2KPushing tag for rev [08123d0e0891] on {http://controller:5000/v1/repositories/fast/tags/latest}
