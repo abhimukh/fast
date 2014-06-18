@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 if [ -b /dev/sda ]; then
    parted /dev/sda mklabel dos
    sync

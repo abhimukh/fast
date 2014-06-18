@@ -57,8 +57,9 @@ poststart() {
           --lxc-conf="lxc.network.name = eth0" \
           --lxc-conf="lxc.network.flags = up" \
           -v /usr/local:/usr/local \
+          -v /root:/root \
           --hostname=${NAME} \
-          -d controller:5000/compute > /dev/null
+          --rm controller:5000/compute & > /dev/null
     elif [ $(docker ps -a | wc -l) -eq 0 ]; then
         docker start $(docker ps -aq | head -1) > /dev/null
     fi
