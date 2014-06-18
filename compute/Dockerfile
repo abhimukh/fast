@@ -10,6 +10,7 @@ RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
 RUN sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key
 RUN ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key
+RUN useradd slurm
 ADD supervisord.conf /usr/etc/supervisord.conf
 VOLUME /usr/local
 EXPOSE 22 6818
