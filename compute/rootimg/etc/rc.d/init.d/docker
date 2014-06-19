@@ -47,22 +47,22 @@ poststart() {
     sleep 3
     IP3_4=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $3"."$4}')
     IP3_4_GW=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $3+127"."$4}')
-    if [ $(docker ps -aq | wc -l) -eq 0 ]; then
-        docker run \
-          -n=false \
-          --lxc-conf="lxc.network.type = veth" \
-          --lxc-conf="lxc.network.ipv4 = 172.16.${IP3_4}/16" \
-          --lxc-conf="lxc.network.ipv4.gateway = 172.16.${IP3_4_GW}" \
-          --lxc-conf="lxc.network.link = docker0" \
-          --lxc-conf="lxc.network.name = eth0" \
-          --lxc-conf="lxc.network.flags = up" \
-          -v /usr/local:/usr/local \
-          -v /root:/root \
-          --hostname=${NAME} \
-          --rm controller:5000/compute & > /dev/null
-    elif [ $(docker ps -a | wc -l) -eq 0 ]; then
-        docker start $(docker ps -aq | head -1) > /dev/null
+    if [ $(docker ps -aq | wc -l) -ne 0 ]; then
     fi
+    docker run \
+       -n=false \
+       --lxc-conf="lxc.network.type = veth" \
+       --lxc-conf="lxc.network.ipv4 = 172.16.${IP3_4}/16" \
+       --lxc-conf="lxc.network.ipv4.gateway = 172.16.${IP3_4_GW}" \
+       --lxc-conf="lxc.network.link = docker0" \
+       --lxc-conf="lxc.network.name = eth0" \
+       --lxc-conf="lxc.network.flags = up" \
+       --privileged \
+       -v /dev/infiniband:/dev/infiniband \
+       -v /usr/local:/usr/local \
+       -v /root:/root \
+       --hostname=${NAME} \
+       --rm controller:5000/compute &
 }
 
 start() {
