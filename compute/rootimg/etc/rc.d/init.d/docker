@@ -42,9 +42,11 @@ prestart() {
 
 poststart() {
     # ClusterVision: make sure the fast container is running.
+    sleep 1
+    docker pull controller:5000/compute 
+
     IP=$(host $(hostname) | awk -F' ' '{print $4}')
     NAME=$(hostname | sed s/node/c/)
-    sleep 3
     IP3_4=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $3"."$4}')
     IP3_4_GW=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $3+127"."$4}')
     if [ $(docker ps -q | wc -l) -ne 0 ]; then
