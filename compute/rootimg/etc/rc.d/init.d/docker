@@ -47,7 +47,11 @@ poststart() {
     sleep 3
     IP3_4=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $3"."$4}')
     IP3_4_GW=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $3+127"."$4}')
+    if [ $(docker ps -q | wc -l) -ne 0 ]; then
+       docker stop $(docker ps -q)
+    fi
     if [ $(docker ps -aq | wc -l) -ne 0 ]; then
+       docker rm -aq $(docker ps -aq)
     fi
     docker run \
        -n=false \
