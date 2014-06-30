@@ -1,6 +1,7 @@
 #!/bin/sh
 docker run \
   -n=false \
+  --dns-search=vc-b \
   --lxc-conf="lxc.network.type = veth" \
   --lxc-conf="lxc.network.ipv4 = 172.17.255.253/16" \
   --lxc-conf="lxc.network.ipv4.gateway = 172.17.42.1" \
