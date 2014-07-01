@@ -41,25 +41,43 @@ prestart() {
 }
 
 poststart() {
-    # ClusterVision: make sure the fast container is running.
+    # ClusterVision
     sleep 1
+    
+    # get the latest version of the image
     docker pull controller:5000/compute 
 
-    IP=$(host $(hostname) | awk -F' ' '{print $4}')
+    # Determine the container name and IP address
+    # IP=$(host $(hostname) | awk -F' ' '{print $4}')
     NAME=$(hostname | sed s/node/c/)
-    IP3_4=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $3"."$4}')
-    IP3_4_GW=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $3+127"."$4}')
+    IP=$(host ${NAME} | awk -F' ' '{print $4}')
+
+    # For now we use a gateway address that was added in fast network.
+    # If this succeeds I will try to remove the GW address (or use the login node).
+    GW=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $1"."$2"."$3+127"."$4}')
+    CLUSTER=$(echo $IP | awk -F'.' '{print $2}')
+
+    # This is ugly, but it translates the cluster number into a name (vc-a to vc-p).
+    # Maybe just change the naming convention to use numeric cluster names?
+    VC=$(printf "vc-\x$(printf %x $(($CLUSTER+96)))")
+ 
+    # Just a few cleanup actions for development. Since we use --rm
+    # (and -r in the general docker), this should not be necessart.
     if [ $(docker ps -q | wc -l) -ne 0 ]; then
        docker stop $(docker ps -q)
     fi
     if [ $(docker ps -aq | wc -l) -ne 0 ]; then
        docker rm -aq $(docker ps -aq)
     fi
+
+    # Start the container
     docker run \
        -n=false \
+       --dns-search=${VC} \
+       --dns=controller \
        --lxc-conf="lxc.network.type = veth" \
-       --lxc-conf="lxc.network.ipv4 = 172.16.${IP3_4}/16" \
-       --lxc-conf="lxc.network.ipv4.gateway = 172.16.${IP3_4_GW}" \
+       --lxc-conf="lxc.network.ipv4 = ${IP} \
+       --lxc-conf="lxc.network.ipv4.gateway = ${GW}" \
        --lxc-conf="lxc.network.link = docker0" \
        --lxc-conf="lxc.network.name = eth0" \
        --lxc-conf="lxc.network.flags = up" \
@@ -67,6 +85,7 @@ poststart() {
        -v /dev/infiniband:/dev/infiniband \
        -v /usr/local:/usr/local \
        -v /root:/root \
+       -v /cluster/${VC}:/cluster \
        --hostname=${NAME} \
        --rm controller:5000/compute &
 }
