@@ -73,7 +73,7 @@ poststart() {
     # Start the container
     docker run \
        -n=false \
-       --dns-search=${VC} \
+       --dns-search="${VC}" \
        --dns=controller \
        --lxc-conf="lxc.network.type = veth" \
        --lxc-conf="lxc.network.ipv4 = ${IP} \
