@@ -8,3 +8,4 @@ compute_x86_64    /   tmpfs   rw  0 1
 /dev/sda1 /var/lib/docker ext2 rw 0 0
 controller:/usr/local /usr/local nfs rsize=8192,wsize=8192,timeo=14,intr,vers=3
 controller:/home /home nfs rsize=8192,wsize=8192,timeo=14,intr,vers=3
+controller:/cluster /cluster nfs rsize=8192,wsize=8192,timeo=14,intr,vers=3

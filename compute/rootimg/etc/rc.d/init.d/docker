@@ -50,17 +50,16 @@ poststart() {
     # Determine the container name and IP address
     # IP=$(host $(hostname) | awk -F' ' '{print $4}')
     NAME=$(hostname | sed s/node/c/)
-    IP=$(host ${NAME} | awk -F' ' '{print $4}')
+    
+    # Determine in which virtual cluster this node is active
+    for VC in vc-{a..l}; do
+        if host $NAME.$VC; then break; fi
+    done
+    IP=$(host ${NAME}.${VC} | awk -F' ' '{print $4}')
 
-    # For now we use a gateway address that was added in fast network.
-    # If this succeeds I will try to remove the GW address (or use the login node).
+    # Set the gateway address on the controller node.
     GW=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $1"."$2"."$3+127"."$4}')
-    CLUSTER=$(echo $IP | awk -F'.' '{print $2}')
 
-    # This is ugly, but it translates the cluster number into a name (vc-a to vc-p).
-    # Maybe just change the naming convention to use numeric cluster names?
-    VC=$(printf "vc-\x$(printf %x $(($CLUSTER+96)))")
- 
     # Just a few cleanup actions for development. Since we use --rm
     # (and -r in the general docker), this should not be necessart.
     if [ $(docker ps -q | wc -l) -ne 0 ]; then
@@ -74,9 +73,9 @@ poststart() {
     docker run \
        -n=false \
        --dns-search="${VC}" \
-       --dns=controller \
+       --dns=10.141.255.254 \
        --lxc-conf="lxc.network.type = veth" \
-       --lxc-conf="lxc.network.ipv4 = ${IP} \
+       --lxc-conf="lxc.network.ipv4 = ${IP}/16" \
        --lxc-conf="lxc.network.ipv4.gateway = ${GW}" \
        --lxc-conf="lxc.network.link = docker0" \
        --lxc-conf="lxc.network.name = eth0" \

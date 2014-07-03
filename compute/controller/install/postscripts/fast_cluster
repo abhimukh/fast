@@ -1,2 +1,0 @@
-cluster=$1
-echo $cluster > /tmp/cluster

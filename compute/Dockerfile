@@ -1,7 +1,7 @@
 FROM centos:latest
 MAINTAINER hans.then@clustervision.com
 RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
-RUN yum -y install openssh-server openssh-clients python-pip vim-minimal infiniband-diags munge rsyslog
+RUN yum -y install openssh-server openssh-clients python-pip vim-minimal infiniband-diags munge rsyslog bind-utils
 RUN yum -y groupinstall "Infiniband Support"
 RUN echo "root:system" | chpasswd && pip install supervisor
 RUN mkdir -p /var/run/sshd ; chmod -rx /var/run/sshd
@@ -12,10 +12,13 @@ RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
 RUN sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config
 RUN sed -ri 's/AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES/AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES LD_LIBRARY_PATH/' /etc/ssh/sshd_config
 RUN useradd slurm
+RUN mkdir /var/slurm; chown slurm /var/slurm
+RUN mkdir -m 755 -p /var/run/munge
+RUN chown munge /var/run/munge
 VOLUME /usr/local
 VOLUME /root
 VOLUME /home
 EXPOSE 22 6818
 ADD supervisord.conf /usr/etc/supervisord.conf
-CMD ["/usr/bin/supervisord"]
-ENV LD_LIBRARY_PATH /usr/local/lib
+ADD munge /etc/sysconfig/munge
+CMD ["/usr/bin/supervisord", "-c", "/usr/etc/supervisord.conf"]
