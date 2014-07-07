@@ -74,8 +74,7 @@ if __name__ == '__main__':
     else:
         command = 'clusters'
 
-    #for line in eval('%s()' % command):
-    #   print line
+    for line in eval('%s()' % command):
+       print line
 
-    print partition([1,3])
    

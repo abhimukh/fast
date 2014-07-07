@@ -12,7 +12,6 @@ RUN sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key
 RUN ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key
 ADD supervisord.conf /usr/etc/supervisord.conf
-ADD munge /etc/sysconfig/munge
 RUN useradd slurm
 RUN mkdir /var/slurm; chown slurm /var/slurm
 RUN mkdir -m 755 -p /var/run/munge

@@ -25,11 +25,9 @@ brctl addbr docker0
 ip link set docker0 up
 
 IP3_4=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $3"."$4}')
-IP3_4_GW=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $3+127"."$4}')
 
 # setup two interfaces docker0 with the gateway interface and docker0:0 in the bridge
 ip addr flush dev docker0
-ip addr add 172.16.${IP3_4_GW}/16 dev docker0
 ip addr add ${IP} dev docker0
 
 # remove the ip addres from eth0
