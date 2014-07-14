@@ -42,11 +42,11 @@ prestart() {
 poststart() {
     for VC in vc-{a..z}; do
         # Skip clusters that have no nodes
-        if ! nodels ${VC} > /dev/null 2>&1 ; then continue; fi
+        if ! /opt/xcat/bin/nodels ${VC} > /dev/null 2>&1 ; then continue; fi
 
         # determine the network we are running on
         IP=$(host login.${VC} | tail -1 | awk -F' ' '{print $4}')
-        GW=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $1"."$2".255.253"}')
+        GW=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $1"."$2".255.250"}')
         # add a gateway address for this node to the docker bridge
         ip addr add ${GW}/16 dev docker0
 
@@ -66,7 +66,7 @@ poststart() {
            -v /root:/root \
            -v /cluster/${VC}:/cluster \
            --hostname=login \
-           --rm -d controller:5000/login &
+           --rm -t controller:5000/login &
     done
 }
 

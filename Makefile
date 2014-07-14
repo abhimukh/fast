@@ -11,9 +11,12 @@ compute/build.txt: compute/Dockerfile compute/supervisord.conf
 	docker push controller:5000/compute
 	date > compute/build.txt
 
-compute: /install/netboot/centos6.5/x86_64/compute/rootimg 
+compute: /install/netboot/centos6.5/x86_64/compute/rootimg compute/build.txt
 	cp -r compute/controller/* /
 	cp -r compute/rootimg/* /install/netboot/centos6.5/x86_64/compute/rootimg
+	chroot /install/netboot/centos6.5/x86_64/compute/rootimg chkconfig ntpd on
+	chroot /install/netboot/centos6.5/x86_64/compute/rootimg chkconfig rdma on
+	mkdir -p /install/netboot/centos6.5/x86_64/compute/rootimg/cluster
 	packimage -o centos6.5 -p compute -a x86_64
 
 login/build.txt: login/Dockerfile login/supervisord.conf

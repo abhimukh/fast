@@ -58,15 +58,16 @@ poststart() {
     IP=$(host ${NAME}.${VC} | awk -F' ' '{print $4}')
 
     # Set the gateway address on the controller node.
-    GW=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $1"."$2"."$3+127"."$4}')
+    GW=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $1"."$2".255.250"}')
+    ip addr add ${GW}/16 dev docker0
 
     # Just a few cleanup actions for development. Since we use --rm
-    # (and -r in the general docker), this should not be necessart.
+    # (and -r in the general docker), this should not be necessary.
     if [ $(docker ps -q | wc -l) -ne 0 ]; then
        docker stop $(docker ps -q)
     fi
     if [ $(docker ps -aq | wc -l) -ne 0 ]; then
-       docker rm -aq $(docker ps -aq)
+       docker rm $(docker ps -aq)
     fi
 
     # Start the container
@@ -86,7 +87,7 @@ poststart() {
        -v /root:/root \
        -v /cluster/${VC}:/cluster \
        --hostname=${NAME} \
-       --rm controller:5000/compute &
+       --rm -t controller:5000/compute &
 }
 
 start() {

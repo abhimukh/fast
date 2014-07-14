@@ -10,7 +10,6 @@ RUN ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key
 RUN sed -ri 's/^#PermitRootLogin yes/PermitRootLogin yes/g' /etc/ssh/sshd_config 
 RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
 RUN sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config
-RUN sed -ri 's/AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES/AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES LD_LIBRARY_PATH/' /etc/ssh/sshd_config
 RUN useradd slurm
 RUN mkdir /var/slurm; chown slurm /var/slurm
 RUN mkdir -m 755 -p /var/run/munge
@@ -20,5 +19,4 @@ VOLUME /root
 VOLUME /home
 EXPOSE 22 6818
 ADD supervisord.conf /usr/etc/supervisord.conf
-ADD munge /etc/sysconfig/munge
 CMD ["/usr/bin/supervisord", "-c", "/usr/etc/supervisord.conf"]
