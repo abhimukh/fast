@@ -28,7 +28,11 @@ login/build.txt: login/Dockerfile login/supervisord.conf
 /install/netboot/centos6.5/x86_64/compute/rootimg: /install/custom/netboot/centos/compute.centos6.5.pkglist
 	genimage -o centos6.5 -p compute -a x86_64 -i ' '
 	
-test: docker image
+test: docker 
 	nodeset compute osimage=
 	rpower compute reset
 	mpirun -np 2 --mca btl self,openib --host c001,c002 /usr/local/sbin/IMB-MPI1 pingpong
+
+slurm:
+	cp slurm/slurm.conf /usr/local/etc/slurm.conf
+	python ./slurm/gen_slurm_conf.py > /usr/local/etc/slurm_nodes.conf

@@ -36,5 +36,6 @@ for type, nodes in types.items():
     else:
         names = 'c' + node_list[0]
     print "NodeName=%s RealMemory=%s CPUs=%s" % (names, type['memory'], type['cpucount'])
+print 
 
 
