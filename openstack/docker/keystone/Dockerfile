@@ -7,16 +7,12 @@ RUN yum install -y --enablerepo=centosplus openstack-utils openstack-selinux
 RUN yum install -y openstack-keystone python-keystoneclient
 RUN keystone-manage pki_setup --keystone-user keystone --keystone-group keystone
 RUN chown -R keystone:keystone /etc/keystone/ssl
+RUN chown -R keystone:keystone /var/log/keystone
 RUN chmod -R o-rwx /etc/keystone/ssl
-RUN openstack-config --set /etc/keystone/keystone.conf \
-   database connection mysql://keystone@controller/keystone
-RUN ADMIN_TOKEN=$(openssl rand -hex 10) && \ 
-   openstack-config --set /etc/keystone/keystone.conf DEFAULT admin_token $ADMIN_TOKEN 
-RUN rm /var/log/keystone/keystone.log
-ADD keystone.sql keystone.sql
-#RUN mysql --protocol=TCP -h controller -u root < keystone.sql
-#RUN su -s /bin/sh -c "keystone-manage db_sync" keystone
-VOLUME /usr/local
-VOLUME /root
-VOLUME /home
-
+ADD supervisord.conf /usr/etc/supervisord.conf
+# For now we just add the configuration file. We should
+# change this so the config files are centrally administered
+# and injected into the container.
+ADD keystone.conf /etc/keystone/keystone.conf
+CMD ["/usr/bin/supervisord", "-c", "/usr/etc/supervisord.conf"]
+RUN pip install supervisor
