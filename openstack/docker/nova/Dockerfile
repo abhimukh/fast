@@ -1,15 +1,12 @@
 FROM centos:latest
 MAINTAINER hans.then@clustervision.com
+CMD ["/usr/bin/supervisord", "-c", "/usr/etc/supervisord.conf"]
 RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
-RUN yum -y install openssh-server openssh-clients python-pip vim-minimal rsyslog bind-utils ntp
-RUN echo "root:system" | chpasswd 
-RUN mkdir -p /var/run/sshd ; chmod -rx /var/run/sshd
-RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key
-RUN ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key
-RUN sed -ri 's/^#PermitRootLogin yes/PermitRootLogin yes/g' /etc/ssh/sshd_config 
-RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
-RUN sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config
-VOLUME /usr/local
-VOLUME /root
-VOLUME /home
-EXPOSE 22 6818
+RUN yum -y install python-pip vim-minimal rsyslog mysql
+RUN yum install -y http://repos.fedorapeople.org/repos/openstack/openstack-icehouse/rdo-release-icehouse-4.noarch.rpm
+RUN yum install -y --enablerepo=centosplus openstack-utils openstack-selinux
+RUN yum install -y openstack-nova-api openstack-nova-cert openstack-nova-conductor \
+                   openstack-nova-console openstack-nova-novncproxy openstack-nova-scheduler \
+                   python-novaclient python-cinderclient
+RUN pip install supervisor
+ADD supervisord.conf /usr/etc/supervisord.conf

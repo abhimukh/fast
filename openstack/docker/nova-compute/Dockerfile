@@ -5,11 +5,6 @@ RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch
 RUN yum -y install python-pip vim-minimal rsyslog mysql
 RUN yum install -y http://repos.fedorapeople.org/repos/openstack/openstack-icehouse/rdo-release-icehouse-4.noarch.rpm
 RUN yum install -y --enablerepo=centosplus openstack-utils openstack-selinux
-RUN yum install -y openstack-nova-api openstack-nova-cert openstack-nova-conductor \
-                   openstack-nova-console openstack-nova-novncproxy openstack-nova-scheduler \
-                   python-novaclient
-# For now we just add the configuration file. We should
-# change this so the config files are centrally administered
-# and injected into the container.
+RUN yum install -y openstack-nova-compute
 RUN pip install supervisor
 ADD supervisord.conf /usr/etc/supervisord.conf
