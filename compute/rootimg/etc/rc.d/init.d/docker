@@ -45,7 +45,7 @@ poststart() {
     sleep 1
     
     # get the latest version of the image
-    docker pull controller:5000/compute 
+    docker pull controller:5050/compute 
 
     # Determine the container name and IP address
     # IP=$(host $(hostname) | awk -F' ' '{print $4}')
@@ -87,7 +87,7 @@ poststart() {
        -v /root:/root \
        -v /cluster/${VC}:/cluster \
        --hostname=${NAME} \
-       --rm -t controller:5000/compute &
+       --rm -t controller:5050/compute &
 }
 
 start() {

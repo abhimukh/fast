@@ -11,4 +11,4 @@ docker run \
   --hostname="login" \
   -v /cluster/vc-a:/cluster/ \
   -v /usr/local:/usr/local \
-  -t -i controller:5000/login /bin/bash
+  -t -i controller:5050/login /bin/bash
