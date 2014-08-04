@@ -10,3 +10,10 @@ RUN yum install -y openstack-nova-api openstack-nova-cert openstack-nova-conduct
                    python-novaclient python-cinderclient
 RUN pip install supervisor
 ADD supervisord.conf /usr/etc/supervisord.conf
+EXPOSE 8773
+EXPOSE 8774
+EXPOSE 8775
+EXPOSE 3333
+EXPOSE 6080
+EXPOSE 5800
+EXPOSE 5900

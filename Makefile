@@ -7,8 +7,8 @@ docker/controller/install/custom/runme/mkfs.tgz: docker/xcat/mkfs/runme
 	tar zcf docker/controller/install/custom/runme/mkfs.tgz -C docker/xcat/mkfs/ runme.sh
 
 compute/build.txt: compute/Dockerfile compute/supervisord.conf
-	docker build -t controller:5000/compute compute
-	docker push controller:5000/compute
+	docker build -t controller:5050/compute compute
+	docker push controller:5050/compute
 	date > compute/build.txt
 
 compute: /install/netboot/centos6.5/x86_64/compute/rootimg compute/build.txt
@@ -21,8 +21,8 @@ compute: /install/netboot/centos6.5/x86_64/compute/rootimg compute/build.txt
 
 login/build.txt: login/Dockerfile login/supervisord.conf
 	cp -r login/controller/* /
-	docker build -t controller:5000/login login
-	docker push controller:5000/login
+	docker build -t controller:5050/login login
+	docker push controller:5050/login
 	date > login/build.txt
 
 /install/netboot/centos6.5/x86_64/compute/rootimg: /install/custom/netboot/centos/compute.centos6.5.pkglist

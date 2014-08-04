@@ -13,6 +13,8 @@ ADD supervisord.conf /usr/etc/supervisord.conf
 # For now we just add the configuration file. We should
 # change this so the config files are centrally administered
 # and injected into the container.
+EXPOSE 5000
+EXPOSE 35357
 ADD keystone.conf /etc/keystone/keystone.conf
 CMD ["/usr/bin/supervisord", "-c", "/usr/etc/supervisord.conf"]
 RUN pip install supervisor

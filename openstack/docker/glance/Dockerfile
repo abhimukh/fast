@@ -11,6 +11,9 @@ RUN yum install -y openstack-glance python-glanceclient
 # and injected into the container.
 RUN pip install supervisor
 ADD supervisord.conf /usr/etc/supervisord.conf
+ADD glance-registry.conf /etc/glance/glance-registry.conf
+ADD glance-api.conf /etc/glance/glance-api.conf
+VOLUME /var/lib/glance
 EXPOSE 9191
 EXPOSE 9292
 
