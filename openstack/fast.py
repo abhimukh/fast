@@ -44,8 +44,8 @@ class FastShell(cmd.Cmd):
         for group, nodes in groups.items():
             print group, nodes
 
-    def do_resource_groups(self, args):
-        """Show all defined resource groups"""
+    def do_categories(self, args):
+        """Show all defined categories"""
         output=check_output("lsdef -t group | grep ^hw- | awk '{print $1}'", 
                              shell=True)
         print output,
@@ -99,24 +99,68 @@ class FastShell(cmd.Cmd):
                  continue
             head = head.split('=')[1]
             head = [int(node[1:]) for node in head.split(',') if len(node)]
+            # Here I should be able to split nodes based on further characteristics.
+            cores, groups, categories = collect_partitions(head)
+            
+            def format_range(r):
+                r = ranges(r)
+                s = ','.join(['%03d-%03d' % (e[0], e[1]) \
+                       if isinstance(e, tuple) else '%03d' % (e, ) \
+                          for e in r])
+                return 'c[' + s + ']' if s else ''
+
             r = ranges(head)
-            slurm_nodes = ','.join(['%03d-%03d' % (e[0], e[1]) \
-                                     if isinstance(e, tuple) else '%03d' % (e, ) \
-                                     for e in r])
-            if slurm_nodes:
-                slurm_nodes = 'c[' + slurm_nodes + ']'
-                print "Assigning to %s: %s" % (cluster, slurm_nodes)
-                # Without with, I know
-                slurm_conf = open("/cluster/%s/etc/slurm-nodes.conf" % \
-                                   cluster, "w")
-                print >> slurm_conf, render('slurm-nodes.conf', 
-                                              {"nodes": slurm_nodes, 
-                                               "cores": 8})
+            for c in cores:
+                cores[c] = format_range(cores[c])
+            for g in groups:
+                groups[g] = format_range(groups[g])
+            for c in categories:
+                categories[c] = format_range(categories[c])
+
+            print "#", cores, groups, categories
+            # Without with, I know
+            slurm_conf = open("/cluster/%s/etc/slurm-nodes.conf" % \
+                               cluster, "w")
+            print >> slurm_conf, render('slurm-nodes.conf', 
+                                          {"cores": cores, 
+                                           "groups": groups,
+                                           "categories": categories})
  
         print "Updating DNS, this may take some time . . ."
         output = check_output("makehosts", shell=True)
         output = check_output("makedns", shell=True)
         print "Done"
+
+def collect_partitions(int_filter):
+    """Collect hardware partitions for the slurm configuration"""
+    groups = defaultdict(list)
+    core_dict = defaultdict(list)
+    cat_dict = defaultdict(list)
+    nodes, headers = table("hwinv")
+    for node in nodes:
+        if not node:
+            continue
+        #['node001', 'Intel(R) Atom(TM) CPU C2750 @ 2.40GHz', '8', '32232MB', 'sda:126GB', '', '']
+        name, cpu, cores, mem, disk, disabled, comment = node
+        id = int(name[4:])
+        if id not in int_filter: continue
+        groups[(cpu, cores, mem, disk)].append(id)
+        core_dict[cores].append(id)
+    categories=check_output("lsdef -t group | grep ^hw- | awk '{print $1}'",
+                             shell=True).split()
+    for category in categories:
+        head = check_output("lsdef -t group %s -i members | " % category +
+                            "grep members", shell=True).strip()
+        if not head:
+            continue
+        head = head.split('=')[1]
+        head = head.split(',')
+        for node in head:
+            id = int(node[4:])
+            if id not in int_filter: continue
+            cat_dict[category].append(id)
+
+    return core_dict, groups, cat_dict
 
 if __name__ == '__main__':
     FastShell().cmdloop()
