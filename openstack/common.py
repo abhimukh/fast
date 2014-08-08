@@ -4,7 +4,7 @@ from operator import itemgetter
 import csv
 from jinja2 import Environment, FileSystemLoader
 
-env = Environment(loader=FileSystemLoader('/root/fast/openstack/templates'))
+env = Environment(loader=FileSystemLoader('/root/fast/openstack/templates'), trim_blocks=True)
 
 def check_output(*popenargs, **kwargs):
     if 'stdout' in kwargs:

@@ -18,5 +18,6 @@ VOLUME /usr/local
 VOLUME /root
 VOLUME /home
 EXPOSE 22 6818
+RUN sed -i s/options\.logger\.critical/options.logger.info/g /usr/lib/python2.6/site-packages/supervisor/supervisord.py
 ADD supervisord.conf /usr/etc/supervisord.conf
 CMD ["/usr/bin/supervisord", "-c", "/usr/etc/supervisord.conf"]

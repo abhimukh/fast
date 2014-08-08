@@ -98,7 +98,7 @@ force_reload() {
 }
 
 rh_status() {
-    status -p $pidfile $prog
+    docker ps | grep vc
 }
 
 rh_status_q() {

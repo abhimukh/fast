@@ -1,0 +1,120 @@
+#!/bin/bash
+#
+#       /etc/rc.d/init.d/fast-compute
+#
+#       Daemon for fast compute containers.
+#       
+# chkconfig:   2345 95 95
+# description: Daemon for fast-compute
+
+### BEGIN INIT INFO
+# Provides:       fast-compute
+# Required-Start: $network docker
+# Required-Stop:
+# Should-Start:
+# Should-Stop:
+# Default-Start: 2 3 4 5
+# Default-Stop:  0 1 6
+# Short-Description: start and stop fast-compute
+# Description: Daemon for fast-compute
+### END INIT INFO
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+export prog=fast-login
+start() {
+    for VC in vc-{a..z}; do
+        # Skip clusters that have no nodes
+        if ! /opt/xcat/bin/nodels ${VC} > /dev/null 2>&1 ; then continue; fi
+
+        # determine the network we are running on
+        IP=$(host login.${VC} | tail -1 | awk -F' ' '{print $4}')
+        GW=$(echo $IP | awk -F'/' '{print $1}' | awk -F'.' '{print $1"."$2".255.250"}')
+        # add a gateway address for this node to the docker bridge
+        ip addr add ${GW}/16 dev docker0
+
+        # Start the container for the login node
+        docker run \
+           -n=false \
+           --dns-search="${VC}" \
+           --dns=10.141.255.254 \
+           --lxc-conf="lxc.network.type = veth" \
+           --lxc-conf="lxc.network.ipv4 = ${IP}/16" \
+           --lxc-conf="lxc.network.ipv4.gateway = ${GW}" \
+           --lxc-conf="lxc.network.link = docker0" \
+           --lxc-conf="lxc.network.name = eth0" \
+           --lxc-conf="lxc.network.flags = up" \
+           -v /dev/infiniband:/dev/infiniband \
+           -v /usr/local:/usr/local \
+           -v /root:/root \
+           -v /cluster/${VC}:/cluster \
+           --hostname=login \
+           --name=login.${VC} \
+           --rm -t controller:5050/login &
+    done
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    NAME=login
+    for VC in vc-{a..l}; do
+        if host ${NAME}.${VC}; then 
+            docker stop ${NAME}.${VC}
+        fi
+    done
+}
+
+restart() {
+    stop
+    start
+}
+
+reload() {
+    restart
+}
+
+force_reload() {
+    restart
+}
+
+rh_status() {
+    docker ps | grep login
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+case "$1" in
+    start)
+        rh_status_q && exit 0
+        $1
+        ;;
+    stop)
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    reload)
+        rh_status_q || exit 7
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+        restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+        exit 2
+esac
+
+exit $?

@@ -19,5 +19,5 @@ RUN chown munge /var/run/munge
 VOLUME /usr/local
 VOLUME /cluster
 EXPOSE 22 6818
+RUN sed -i s/options\.logger\.critical/options.logger.info/g /usr/lib/python2.6/site-packages/supervisor/supervisord.py
 CMD ["/usr/bin/supervisord", "-c", "/usr/etc/supervisord.conf"]
-

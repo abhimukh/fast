@@ -109,13 +109,13 @@ class FastShell(cmd.Cmd):
                           for e in r])
                 return 'c[' + s + ']' if s else ''
 
-            r = ranges(head)
             for c in cores:
                 cores[c] = format_range(cores[c])
             for g in groups:
                 groups[g] = format_range(groups[g])
             for c in categories:
                 categories[c] = format_range(categories[c])
+            compute = format_range(head)
 
             print "#", cores, groups, categories
             # Without with, I know
@@ -124,7 +124,8 @@ class FastShell(cmd.Cmd):
             print >> slurm_conf, render('slurm-nodes.conf', 
                                           {"cores": cores, 
                                            "groups": groups,
-                                           "categories": categories})
+                                           "categories": categories,
+                                           "compute": compute})
  
         print "Updating DNS, this may take some time . . ."
         output = check_output("makehosts", shell=True)

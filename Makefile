@@ -16,8 +16,11 @@ compute: /install/netboot/centos6.5/x86_64/compute/rootimg compute/build.txt
 	cp -r compute/rootimg/* /install/netboot/centos6.5/x86_64/compute/rootimg
 	chroot /install/netboot/centos6.5/x86_64/compute/rootimg chkconfig ntpd on
 	chroot /install/netboot/centos6.5/x86_64/compute/rootimg chkconfig rdma on
+	chroot /install/netboot/centos6.5/x86_64/compute/rootimg chkconfig fast-compute on
 	mkdir -p /install/netboot/centos6.5/x86_64/compute/rootimg/cluster
 	packimage -o centos6.5 -p compute -a x86_64
+
+login: login/build.txt
 
 login/build.txt: login/Dockerfile login/supervisord.conf
 	cp -r login/controller/* /
@@ -33,6 +36,3 @@ test: docker
 	rpower compute reset
 	mpirun -np 2 --mca btl self,openib --host c001,c002 /usr/local/sbin/IMB-MPI1 pingpong
 
-slurm:
-	cp slurm/slurm.conf /usr/local/etc/slurm.conf
-	python ./slurm/gen_slurm_conf.py > /usr/local/etc/slurm_nodes.conf
